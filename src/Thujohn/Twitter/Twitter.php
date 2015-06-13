@@ -437,14 +437,9 @@ class Twitter extends tmhOAuth {
 
 	private function jsonDecode($json, $assoc = false)
 	{
-		if (version_compare(PHP_VERSION, '5.4.0', '>=') && !(defined('JSON_C_VERSION') && PHP_INT_SIZE > 4))
-		{
-			return json_decode($json, $assoc, 512, JSON_BIGINT_AS_STRING);
-		}
-		else
-		{
-			return json_decode($json, $assoc);
-		}
+		$max_int_length = strlen((string) PHP_INT_MAX) - 1;
+                $json_without_bigints = preg_replace('/:\s*(-?\d{'.$max_int_length.',})/', ': "$1"', $json);
+                return json_decode($json_without_bigints);	
 	}
 
 }
